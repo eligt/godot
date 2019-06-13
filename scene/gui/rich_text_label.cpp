@@ -189,7 +189,7 @@ int RichTextLabel::_process_line(ItemFrame *p_frame, const Vector2 &p_ofs, int &
 	Ref<Font> cfont = _find_font(it);
 	if (cfont.is_null())
 		cfont = p_base_font;
-	
+
 	real_t cfont_size = _find_size(it);
 	real_t cfont_scale = 1.0;
 	if (cfont_size > 0)
@@ -318,12 +318,12 @@ int RichTextLabel::_process_line(ItemFrame *p_frame, const Vector2 &p_ofs, int &
 				Ref<Font> font = _find_font(it);
 				if (font.is_null())
 					font = p_base_font;
-				
+
 				real_t font_size = _find_size(it);
 				real_t font_scale = cfont_scale;
 				if (font_size > 0)
 					font_scale = (real_t)font_size / font->get_height();
-				
+
 				const CharType *c = text->text.c_str();
 				const CharType *cf = c;
 				int ascent = font->get_ascent() * font_scale;
@@ -515,7 +515,7 @@ int RichTextLabel::_process_line(ItemFrame *p_frame, const Vector2 &p_ofs, int &
 				Ref<Font> font = _find_font(it);
 				if (font.is_null())
 					font = p_base_font;
-				
+
 				real_t font_size = _find_size(it);
 				real_t font_scale = cfont_scale;
 				if (font_size > 0)
@@ -1216,12 +1216,12 @@ int RichTextLabel::_find_margin(Item *p_item, const Ref<Font> &p_base_font) {
 			Ref<Font> font = _find_font(item);
 			if (font.is_null())
 				font = p_base_font;
-			
+
 			real_t font_size = _find_size(item);
 			real_t font_scale = 1.0;
 			if (font_size > 0)
 				font_scale = (real_t)font_size / font->get_height();
-			
+
 			ItemIndent *indent = static_cast<ItemIndent *>(item);
 
 			margin += indent->level * tab_size * font->get_char_size(' ').width * font_scale;
@@ -1993,7 +1993,7 @@ Error RichTextLabel::append_bbcode(const String &p_bbcode) {
 			tag_stack.push_front("color");
 
 		} else if (tag.begins_with("font=")) {
-			
+
 			String fnt = tag.substr(5, tag.length());
 
 			Ref<Font> font = ResourceLoader::load(fnt, "Font");
@@ -2006,15 +2006,15 @@ Error RichTextLabel::append_bbcode(const String &p_bbcode) {
 			tag_stack.push_front("font");
 
 		} else if (tag.begins_with("size=")) {
-			
+
 			int size = tag.substr(5, tag.length()).to_int();
-	
+
 			if (size > 0)
 				push_size(size);
-	
+
 			pos = brk_end + 1;
 			tag_stack.push_front("size");
-	
+
 		} else {
 
 			add_text("["); //ignore
@@ -2083,16 +2083,16 @@ bool RichTextLabel::search(const String &p_string, bool p_from_selection, bool p
 				update();
 
 				_validate_line_caches(main);
-				
+
 				Ref<Font> font = _find_font(t);
 				if (!font.is_valid())
 					font = get_font("normal_font");
-				
+
 				real_t font_size = _find_size(t);
 				real_t font_scale = 1.0;
 				if (font_size > 0)
 					font_scale = (real_t)font_size / font->get_height();
-				
+
 				int fh = font->get_height() * font_scale;
 
 				float offset = 0;

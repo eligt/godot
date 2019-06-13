@@ -123,7 +123,7 @@ public:
 
 	void set_uppercase(bool p_uppercase);
 	bool is_uppercase() const;
-	
+
 	void set_font_size(float p_font_size);
 	float get_font_size() const;
 

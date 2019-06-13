@@ -67,7 +67,7 @@ float Label::get_font_size() const {
 }
 
 int Label::get_line_height() const {
-	
+
 	Ref<Font> font = get_font("font");
 	float font_scale = font_size > CMP_EPSILON ? (font_size / font->get_height()) : 1.0;
 	return font->get_height() * font_scale;

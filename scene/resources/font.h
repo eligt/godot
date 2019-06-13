@@ -93,7 +93,7 @@ public:
 			outline_color(p_outline_color) {
 		has_outline = p_font->has_outline();
 	}
-	
+
 	float draw_char(RID p_canvas_item, const Point2 &p_pos, CharType p_char, CharType p_next = 0, const Color &p_modulate = Color(1, 1, 1)) {
 		return draw_char_scaled(p_canvas_item, p_pos, 1.0, p_char, p_next, p_modulate);
 	}
