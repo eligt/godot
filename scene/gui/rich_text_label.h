@@ -60,6 +60,7 @@ public:
 		ITEM_IMAGE,
 		ITEM_NEWLINE,
 		ITEM_FONT,
+		ITEM_SIZE,
 		ITEM_COLOR,
 		ITEM_UNDERLINE,
 		ITEM_STRIKETHROUGH,
@@ -147,11 +148,17 @@ private:
 		Ref<Texture> image;
 		ItemImage() { type = ITEM_IMAGE; }
 	};
-
+	
 	struct ItemFont : public Item {
 
 		Ref<Font> font;
 		ItemFont() { type = ITEM_FONT; }
+	};
+	
+	struct ItemSize : public Item {
+
+		real_t size;
+		ItemSize() { type = ITEM_SIZE; }
 	};
 
 	struct ItemColor : public Item {
@@ -278,8 +285,9 @@ private:
 
 	int _process_line(ItemFrame *p_frame, const Vector2 &p_ofs, int &y, int p_width, int p_line, ProcessMode p_mode, const Ref<Font> &p_base_font, const Color &p_base_color, const Color &p_font_color_shadow, bool p_shadow_as_outline, const Point2 &shadow_ofs, const Point2i &p_click_pos = Point2i(), Item **r_click_item = NULL, int *r_click_char = NULL, bool *r_outside = NULL, int p_char_count = 0);
 	void _find_click(ItemFrame *p_frame, const Point2i &p_click, Item **r_click_item = NULL, int *r_click_char = NULL, bool *r_outside = NULL);
-
+	
 	Ref<Font> _find_font(Item *p_item);
+	real_t _find_size(Item *p_item);
 	int _find_margin(Item *p_item, const Ref<Font> &p_base_font);
 	Align _find_align(Item *p_item);
 	Color _find_color(Item *p_item, const Color &p_default_color);
@@ -313,6 +321,7 @@ public:
 	void add_newline();
 	bool remove_line(const int p_line);
 	void push_font(const Ref<Font> &p_font);
+	void push_size(real_t size);
 	void push_color(const Color &p_color);
 	void push_underline();
 	void push_strikethrough();

@@ -189,11 +189,15 @@ int RichTextLabel::_process_line(ItemFrame *p_frame, const Vector2 &p_ofs, int &
 	Ref<Font> cfont = _find_font(it);
 	if (cfont.is_null())
 		cfont = p_base_font;
-
+	
+	real_t cfont_size = _find_size(it);
+	real_t cfont_scale = 1.0;
+	if (cfont_size > 0)
+		cfont_scale = (real_t)cfont_size / cfont->get_height();
 	//line height should be the font height for the first time, this ensures that an empty line will never have zero height and successive newlines are displayed
-	int line_height = cfont->get_height();
-	int line_ascent = cfont->get_ascent();
-	int line_descent = cfont->get_descent();
+	int line_height = cfont->get_height() * cfont_scale;
+	int line_ascent = cfont->get_ascent() * cfont_scale;
+	int line_descent = cfont->get_descent() * cfont_scale;
 
 	int nonblank_line_count = 0; //number of nonblank lines as counted during PROCESS_DRAW
 
@@ -314,11 +318,16 @@ int RichTextLabel::_process_line(ItemFrame *p_frame, const Vector2 &p_ofs, int &
 				Ref<Font> font = _find_font(it);
 				if (font.is_null())
 					font = p_base_font;
-
+				
+				real_t font_size = _find_size(it);
+				real_t font_scale = cfont_scale;
+				if (font_size > 0)
+					font_scale = (real_t)font_size / font->get_height();
+				
 				const CharType *c = text->text.c_str();
 				const CharType *cf = c;
-				int ascent = font->get_ascent();
-				int descent = font->get_descent();
+				int ascent = font->get_ascent() * font_scale;
+				int descent = font->get_descent() * font_scale;
 
 				Color color;
 				Color font_color_shadow;
@@ -356,9 +365,9 @@ int RichTextLabel::_process_line(ItemFrame *p_frame, const Vector2 &p_ofs, int &
 					}
 					while (c[end] != 0 && !(end && c[end - 1] == ' ' && c[end] != ' ')) {
 
-						int cw = font->get_char_size(c[end], c[end + 1]).width;
+						int cw = font->get_char_size(c[end], c[end + 1]).width * font_scale;
 						if (c[end] == '\t') {
-							cw = tab_size * font->get_char_size(' ').width;
+							cw = tab_size * font->get_char_size(' ').width * font_scale;
 						}
 
 						if (end > 0 && w + cw + begin > p_width) {
@@ -379,7 +388,7 @@ int RichTextLabel::_process_line(ItemFrame *p_frame, const Vector2 &p_ofs, int &
 
 					if (end && c[end - 1] == ' ') {
 						if (p_mode == PROCESS_CACHE) {
-							spaces_size += font->get_char_size(' ').width;
+							spaces_size += font->get_char_size(' ').width * font_scale;
 						} else if (align == ALIGN_FILL) {
 							int ln = MIN(l.offset_caches.size() - 1, line);
 							if (l.space_caches[ln]) {
@@ -399,10 +408,10 @@ int RichTextLabel::_process_line(ItemFrame *p_frame, const Vector2 &p_ofs, int &
 							if (p_mode == PROCESS_POINTER && r_click_char && p_click_pos.y >= p_ofs.y + y && p_click_pos.y <= p_ofs.y + y + lh) {
 								//int o = (wofs+w)-p_click_pos.x;
 
-								int cw = font->get_char_size(c[i], c[i + 1]).x;
+								int cw = font->get_char_size(c[i], c[i + 1]).x * font_scale;
 
 								if (c[i] == '\t') {
-									cw = tab_size * font->get_char_size(' ').width;
+									cw = tab_size * font->get_char_size(' ').width * font_scale;
 								}
 
 								if (p_click_pos.x - cw / 2 > p_ofs.x + align_ofs + pofs) {
@@ -433,33 +442,33 @@ int RichTextLabel::_process_line(ItemFrame *p_frame, const Vector2 &p_ofs, int &
 
 								if (visible) {
 									if (selected) {
-										cw = font->get_char_size(c[i], c[i + 1]).x;
+										cw = font->get_char_size(c[i], c[i + 1]).x * font_scale;
 										draw_rect(Rect2(p_ofs.x + pofs, p_ofs.y + y, cw, lh), selection_bg);
 									}
 
 									if (p_font_color_shadow.a > 0) {
 										float x_ofs_shadow = align_ofs + pofs;
 										float y_ofs_shadow = y + lh - line_descent;
-										float move = font->draw_char(ci, Point2(x_ofs_shadow, y_ofs_shadow) + shadow_ofs, c[i], c[i + 1], p_font_color_shadow);
+										float move = font->draw_char_scaled(ci, Point2(x_ofs_shadow, y_ofs_shadow) + shadow_ofs, font_scale, c[i], c[i + 1], p_font_color_shadow);
 
 										if (p_shadow_as_outline) {
-											font->draw_char(ci, Point2(x_ofs_shadow, y_ofs_shadow) + Vector2(-shadow_ofs.x, shadow_ofs.y), c[i], c[i + 1], p_font_color_shadow);
-											font->draw_char(ci, Point2(x_ofs_shadow, y_ofs_shadow) + Vector2(shadow_ofs.x, -shadow_ofs.y), c[i], c[i + 1], p_font_color_shadow);
-											font->draw_char(ci, Point2(x_ofs_shadow, y_ofs_shadow) + Vector2(-shadow_ofs.x, -shadow_ofs.y), c[i], c[i + 1], p_font_color_shadow);
+											font->draw_char_scaled(ci, Point2(x_ofs_shadow, y_ofs_shadow) + Vector2(-shadow_ofs.x, shadow_ofs.y), font_scale, c[i], c[i + 1], p_font_color_shadow);
+											font->draw_char_scaled(ci, Point2(x_ofs_shadow, y_ofs_shadow) + Vector2(shadow_ofs.x, -shadow_ofs.y), font_scale, c[i], c[i + 1], p_font_color_shadow);
+											font->draw_char_scaled(ci, Point2(x_ofs_shadow, y_ofs_shadow) + Vector2(-shadow_ofs.x, -shadow_ofs.y), font_scale, c[i], c[i + 1], p_font_color_shadow);
 										}
 										x_ofs_shadow += move;
 									}
 
 									if (selected) {
-										drawer.draw_char(ci, p_ofs + Point2(align_ofs + pofs, y + lh - line_descent), c[i], c[i + 1], override_selected_font_color ? selection_fg : color);
+										drawer.draw_char_scaled(ci, p_ofs + Point2(align_ofs + pofs, y + lh - line_descent), font_scale, c[i], c[i + 1], override_selected_font_color ? selection_fg : color);
 									} else {
-										cw = drawer.draw_char(ci, p_ofs + Point2(align_ofs + pofs, y + lh - line_descent), c[i], c[i + 1], color);
+										cw = drawer.draw_char_scaled(ci, p_ofs + Point2(align_ofs + pofs, y + lh - line_descent), font_scale, c[i], c[i + 1], color);
 									}
 								}
 
 								p_char_count++;
 								if (c[i] == '\t') {
-									cw = tab_size * font->get_char_size(' ').width;
+									cw = tab_size * font->get_char_size(' ').width * font_scale;
 								}
 
 								ofs += cw;
@@ -506,23 +515,28 @@ int RichTextLabel::_process_line(ItemFrame *p_frame, const Vector2 &p_ofs, int &
 				Ref<Font> font = _find_font(it);
 				if (font.is_null())
 					font = p_base_font;
+				
+				real_t font_size = _find_size(it);
+				real_t font_scale = cfont_scale;
+				if (font_size > 0)
+					font_scale = (real_t)font_size / font->get_height();
 
 				if (p_mode == PROCESS_POINTER && r_click_char)
 					*r_click_char = 0;
 
 				ENSURE_WIDTH(img->image->get_width());
 
-				bool visible = visible_characters < 0 || (p_char_count < visible_characters && YRANGE_VISIBLE(y + lh - font->get_descent() - img->image->get_height(), img->image->get_height()));
+				bool visible = visible_characters < 0 || (p_char_count < visible_characters && YRANGE_VISIBLE(y + lh - font->get_descent() * font_scale - img->image->get_height(), img->image->get_height()));
 				if (visible)
 					line_is_blank = false;
 
 				if (p_mode == PROCESS_DRAW && visible) {
-					img->image->draw(ci, p_ofs + Point2(align_ofs + wofs, y + lh - font->get_descent() - img->image->get_height()));
+					img->image->draw(ci, p_ofs + Point2(align_ofs + wofs, y + lh - font->get_descent() * font_scale - img->image->get_height()));
 				}
 				p_char_count++;
 
 				ADVANCE(img->image->get_width());
-				CHECK_HEIGHT((img->image->get_height() + font->get_descent()));
+				CHECK_HEIGHT((img->image->get_height() + font->get_descent() * font_scale));
 
 			} break;
 			case ITEM_NEWLINE: {
@@ -1171,6 +1185,24 @@ Ref<Font> RichTextLabel::_find_font(Item *p_item) {
 	return Ref<Font>();
 }
 
+real_t RichTextLabel::_find_size(Item *p_item) {
+
+	Item *sizeitem = p_item;
+
+	while (sizeitem) {
+
+		if (sizeitem->type == ITEM_SIZE) {
+
+			ItemSize *fi = static_cast<ItemSize *>(sizeitem);
+			return fi->size;
+		}
+
+		sizeitem = sizeitem->parent;
+	}
+
+	return 0;
+}
+
 int RichTextLabel::_find_margin(Item *p_item, const Ref<Font> &p_base_font) {
 
 	Item *item = p_item;
@@ -1184,10 +1216,15 @@ int RichTextLabel::_find_margin(Item *p_item, const Ref<Font> &p_base_font) {
 			Ref<Font> font = _find_font(item);
 			if (font.is_null())
 				font = p_base_font;
-
+			
+			real_t font_size = _find_size(item);
+			real_t font_scale = 1.0;
+			if (font_size > 0)
+				font_scale = (real_t)font_size / font->get_height();
+			
 			ItemIndent *indent = static_cast<ItemIndent *>(item);
 
-			margin += indent->level * tab_size * font->get_char_size(' ').width;
+			margin += indent->level * tab_size * font->get_char_size(' ').width * font_scale;
 
 		} else if (item->type == ITEM_LIST) {
 
@@ -1503,6 +1540,16 @@ void RichTextLabel::push_font(const Ref<Font> &p_font) {
 	ItemFont *item = memnew(ItemFont);
 
 	item->font = p_font;
+	_add_item(item, true);
+}
+
+void RichTextLabel::push_size(real_t size) {
+
+	ERR_FAIL_COND(current->type == ITEM_TABLE);
+	ERR_FAIL_COND(size <= 0);
+	ItemSize *item = memnew(ItemSize);
+
+	item->size = size;
 	_add_item(item, true);
 }
 
@@ -1946,7 +1993,7 @@ Error RichTextLabel::append_bbcode(const String &p_bbcode) {
 			tag_stack.push_front("color");
 
 		} else if (tag.begins_with("font=")) {
-
+			
 			String fnt = tag.substr(5, tag.length());
 
 			Ref<Font> font = ResourceLoader::load(fnt, "Font");
@@ -1958,6 +2005,16 @@ Error RichTextLabel::append_bbcode(const String &p_bbcode) {
 			pos = brk_end + 1;
 			tag_stack.push_front("font");
 
+		} else if (tag.begins_with("size=")) {
+			
+			int size = tag.substr(5, tag.length()).to_int();
+	
+			if (size > 0)
+				push_size(size);
+	
+			pos = brk_end + 1;
+			tag_stack.push_front("size");
+	
 		} else {
 
 			add_text("["); //ignore
@@ -2026,8 +2083,17 @@ bool RichTextLabel::search(const String &p_string, bool p_from_selection, bool p
 				update();
 
 				_validate_line_caches(main);
-
-				int fh = _find_font(t).is_valid() ? _find_font(t)->get_height() : get_font("normal_font")->get_height();
+				
+				Ref<Font> font = _find_font(t);
+				if (!font.is_valid())
+					font = get_font("normal_font");
+				
+				real_t font_size = _find_size(t);
+				real_t font_scale = 1.0;
+				if (font_size > 0)
+					font_scale = (real_t)font_size / font->get_height();
+				
+				int fh = font->get_height() * font_scale;
 
 				float offset = 0;
 
@@ -2281,6 +2347,7 @@ void RichTextLabel::_bind_methods() {
 	BIND_ENUM_CONSTANT(ITEM_IMAGE);
 	BIND_ENUM_CONSTANT(ITEM_NEWLINE);
 	BIND_ENUM_CONSTANT(ITEM_FONT);
+	BIND_ENUM_CONSTANT(ITEM_SIZE);
 	BIND_ENUM_CONSTANT(ITEM_COLOR);
 	BIND_ENUM_CONSTANT(ITEM_UNDERLINE);
 	BIND_ENUM_CONSTANT(ITEM_STRIKETHROUGH);
