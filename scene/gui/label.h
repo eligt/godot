@@ -66,6 +66,7 @@ private:
 	Size2 minsize;
 	int line_count;
 	bool uppercase;
+	float font_size;
 
 	int get_longest_line_width() const;
 
@@ -122,6 +123,9 @@ public:
 
 	void set_uppercase(bool p_uppercase);
 	bool is_uppercase() const;
+
+	void set_font_size(float p_font_size);
+	float get_font_size() const;
 
 	void set_visible_characters(int p_amount);
 	int get_visible_characters() const;
