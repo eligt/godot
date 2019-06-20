@@ -414,7 +414,8 @@ void EditorHelp::_update_doc() {
 		class_desc->add_text(TTR("Brief Description:"));
 		class_desc->pop();
 		class_desc->pop();
-
+		
+		class_desc->add_newline();
 		class_desc->add_newline();
 		class_desc->push_color(text_color);
 		class_desc->push_font(doc_font);
@@ -440,7 +441,8 @@ void EditorHelp::_update_doc() {
 		class_desc->add_text(TTR("Properties:"));
 		class_desc->pop();
 		class_desc->pop();
-
+		
+		class_desc->add_newline();
 		class_desc->push_indent(1);
 		class_desc->push_table(2);
 		class_desc->set_table_column_expand(1, 1);
@@ -478,14 +480,15 @@ void EditorHelp::_update_doc() {
 			class_desc->push_font(doc_code_font);
 			class_desc->push_color(headline_color);
 			_add_text(cd.properties[i].name);
-
+			
+			class_desc->pop();
+			class_desc->pop();
+			
 			if (describe) {
 				class_desc->pop();
 				property_descr = true;
 			}
 
-			class_desc->pop();
-			class_desc->pop();
 			class_desc->pop();
 		}
 
@@ -518,7 +521,8 @@ void EditorHelp::_update_doc() {
 		class_desc->add_text(TTR("Methods:"));
 		class_desc->pop();
 		class_desc->pop();
-
+		
+		class_desc->add_newline();
 		class_desc->push_font(doc_code_font);
 		class_desc->push_indent(1);
 		class_desc->push_table(2);
@@ -874,7 +878,8 @@ void EditorHelp::_update_doc() {
 		class_desc->add_text(TTR("Class Description:"));
 		class_desc->pop();
 		class_desc->pop();
-
+		
+		class_desc->add_newline();
 		class_desc->add_newline();
 		class_desc->push_color(text_color);
 		class_desc->push_font(doc_font);
@@ -998,7 +1003,8 @@ void EditorHelp::_update_doc() {
 			}
 
 			class_desc->pop(); // table
-
+			
+			class_desc->add_newline();
 			class_desc->add_newline();
 
 			class_desc->push_color(text_color);
@@ -1042,6 +1048,8 @@ void EditorHelp::_update_doc() {
 			class_desc->pop();
 
 			class_desc->add_newline();
+			class_desc->add_newline();
+			
 			class_desc->push_color(text_color);
 			class_desc->push_font(doc_font);
 			class_desc->push_indent(1);
