@@ -811,7 +811,7 @@ Ref<Image> RasterizerStorageGLES2::texture_get_data(RID p_texture, int p_layer) 
 
 	data.resize(data_size);
 
-	Image *img = memnew(Image(texture->alloc_width, texture->alloc_height, texture->mipmaps > 1 ? true : false, real_format, data));
+	Image *img = memnew(Image(texture->alloc_width, texture->alloc_height, texture->mipmaps > 1, real_format, data));
 
 	return Ref<Image>(img);
 #else
@@ -4526,9 +4526,7 @@ void RasterizerStorageGLES2::instance_add_dependency(RID p_base, RasterizerScene
 			ERR_FAIL_COND(!inst);
 		} break;
 		default: {
-			if (!inst) {
-				ERR_FAIL();
-			}
+			ERR_FAIL();
 		}
 	}
 
@@ -4573,14 +4571,9 @@ void RasterizerStorageGLES2::instance_remove_dependency(RID p_base, RasterizerSc
 			ERR_FAIL_COND(!inst);
 		} break;
 		default: {
-
-			if (!inst) {
-				ERR_FAIL();
-			}
+			ERR_FAIL();
 		}
 	}
-
-	ERR_FAIL_COND(!inst);
 
 	inst->instance_list.remove(&p_instance->dependency_item);
 }

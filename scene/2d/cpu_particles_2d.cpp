@@ -250,6 +250,8 @@ void CPUParticles2D::restart() {
 	frame_remainder = 0;
 	cycle = 0;
 
+	set_emitting(true);
+
 	{
 		int pc = particles.size();
 		PoolVector<Particle>::Write w = particles.write();
@@ -530,7 +532,8 @@ void CPUParticles2D::_particles_process(float p_delta) {
 		time = Math::fmod(time, lifetime);
 		cycle++;
 		if (one_shot && cycle > 0) {
-			emitting = false;
+			set_emitting(false);
+			_change_notify();
 		}
 	}
 
@@ -1391,10 +1394,10 @@ CPUParticles2D::CPUParticles2D() {
 
 	set_spread(45);
 	set_flatness(0);
-	set_param(PARAM_INITIAL_LINEAR_VELOCITY, 1);
+	set_param(PARAM_INITIAL_LINEAR_VELOCITY, 0);
+	set_param(PARAM_ANGULAR_VELOCITY, 0);
 	set_param(PARAM_ORBIT_VELOCITY, 0);
 	set_param(PARAM_LINEAR_ACCEL, 0);
-	set_param(PARAM_ANGULAR_VELOCITY, 0);
 	set_param(PARAM_RADIAL_ACCEL, 0);
 	set_param(PARAM_TANGENTIAL_ACCEL, 0);
 	set_param(PARAM_DAMPING, 0);
@@ -1407,7 +1410,7 @@ CPUParticles2D::CPUParticles2D() {
 	set_emission_sphere_radius(1);
 	set_emission_rect_extents(Vector2(1, 1));
 
-	set_gravity(Vector2(0, 98.8));
+	set_gravity(Vector2(0, 98));
 
 	for (int i = 0; i < PARAM_MAX; i++) {
 		set_param_randomness(Parameter(i), 0);

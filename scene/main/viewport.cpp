@@ -172,14 +172,16 @@ ViewportTexture::~ViewportTexture() {
 
 class TooltipPanel : public PanelContainer {
 
-	GDCLASS(TooltipPanel, PanelContainer)
+	GDCLASS(TooltipPanel, PanelContainer);
+
 public:
 	TooltipPanel(){};
 };
 
 class TooltipLabel : public Label {
 
-	GDCLASS(TooltipLabel, Label)
+	GDCLASS(TooltipLabel, Label);
+
 public:
 	TooltipLabel(){};
 };
@@ -530,7 +532,7 @@ void Viewport::_notification(int p_what) {
 											Map<ObjectID, uint64_t>::Element *F = physics_2d_mouseover.find(res[i].collider_id);
 
 											if (!F) {
-												F = physics_2d_mouseover.insert(res[i].collider_id, frame);
+												physics_2d_mouseover.insert(res[i].collider_id, frame);
 												co->_mouse_enter();
 											} else {
 												F->get() = frame;
@@ -1442,9 +1444,7 @@ void Viewport::_gui_show_tooltip() {
 		return;
 	}
 
-	Control *rp = which; //->get_root_parent_control();
-	if (!rp)
-		return;
+	Control *rp = which;
 
 	gui.tooltip_popup = which->make_custom_tooltip(tooltip);
 

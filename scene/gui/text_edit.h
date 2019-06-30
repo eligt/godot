@@ -40,7 +40,7 @@ class SyntaxHighlighter;
 
 class TextEdit : public Control {
 
-	GDCLASS(TextEdit, Control)
+	GDCLASS(TextEdit, Control);
 
 public:
 	struct HighlighterInfo {
@@ -184,7 +184,8 @@ private:
 		Color line_number_color;
 		Color safe_line_number_color;
 		Color font_color;
-		Color font_selected_color;
+		Color font_color_selected;
+		Color font_color_readonly;
 		Color keyword_color;
 		Color number_color;
 		Color function_color;

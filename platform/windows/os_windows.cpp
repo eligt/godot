@@ -843,8 +843,8 @@ LRESULT OS_Windows::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 			if (wParam==VK_WIN) TODO wtf is this?
 				meta_mem=uMsg==WM_KEYDOWN;
 			*/
-
-		} //fallthrough
+			FALLTHROUGH;
+		}
 		case WM_CHAR: {
 
 			ERR_BREAK(key_event_pos >= KEY_EVENT_BUFFER_SIZE);
@@ -1977,6 +1977,17 @@ void OS_Windows::set_window_always_on_top(bool p_enabled) {
 
 bool OS_Windows::is_window_always_on_top() const {
 	return video_mode.always_on_top;
+}
+
+void OS_Windows::set_console_visible(bool p_enabled) {
+	if (console_visible == p_enabled)
+		return;
+	ShowWindow(GetConsoleWindow(), p_enabled ? SW_SHOW : SW_HIDE);
+	console_visible = p_enabled;
+}
+
+bool OS_Windows::is_console_visible() const {
+	return console_visible;
 }
 
 bool OS_Windows::get_window_per_pixel_transparency_enabled() const {
@@ -3231,6 +3242,7 @@ OS_Windows::OS_Windows(HINSTANCE _hInstance) {
 	control_mem = false;
 	meta_mem = false;
 	minimized = false;
+	console_visible = IsWindowVisible(GetConsoleWindow());
 
 	hInstance = _hInstance;
 	pressrc = 0;

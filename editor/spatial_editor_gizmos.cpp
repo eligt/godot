@@ -275,15 +275,13 @@ void EditorSpatialGizmo::add_unscaled_billboard(const Ref<Material> &p_material,
 	mesh->add_surface_from_arrays(Mesh::PRIMITIVE_TRIANGLE_FAN, a);
 	mesh->surface_set_material(0, p_material);
 
-	if (true) {
-		float md = 0;
-		for (int i = 0; i < vs.size(); i++) {
+	float md = 0;
+	for (int i = 0; i < vs.size(); i++) {
 
-			md = MAX(0, vs[i].length());
-		}
-		if (md) {
-			mesh->set_custom_aabb(AABB(Vector3(-md, -md, -md), Vector3(md, md, md) * 2.0));
-		}
+		md = MAX(0, vs[i].length());
+	}
+	if (md) {
+		mesh->set_custom_aabb(AABB(Vector3(-md, -md, -md), Vector3(md, md, md) * 2.0));
 	}
 
 	selectable_icon_size = p_scale;
@@ -432,9 +430,7 @@ bool EditorSpatialGizmo::intersect_frustum(const Camera *p_camera, const Vector<
 			}
 		}
 
-		if (!any_out)
-			return true;
-		return false;
+		return !any_out;
 	}
 
 	if (collision_segments.size()) {
@@ -1835,12 +1831,12 @@ void PhysicalBoneSpatialGizmoPlugin::redraw(EditorSpatialGizmo *p_gizmo) {
 			JointSpatialGizmoPlugin::CreateConeTwistJointGizmo(
 					physical_bone->get_joint_offset(),
 					physical_bone->get_global_transform() * physical_bone->get_joint_offset(),
-					pb ? pb->get_global_transform() : Transform(),
-					pbp ? pbp->get_global_transform() : Transform(),
+					pb->get_global_transform(),
+					pbp->get_global_transform(),
 					cjd->swing_span,
 					cjd->twist_span,
-					pb ? &points : NULL,
-					pbp ? &points : NULL);
+					&points,
+					&points);
 		} break;
 		case PhysicalBone::JOINT_TYPE_HINGE: {
 
@@ -1848,14 +1844,14 @@ void PhysicalBoneSpatialGizmoPlugin::redraw(EditorSpatialGizmo *p_gizmo) {
 			JointSpatialGizmoPlugin::CreateHingeJointGizmo(
 					physical_bone->get_joint_offset(),
 					physical_bone->get_global_transform() * physical_bone->get_joint_offset(),
-					pb ? pb->get_global_transform() : Transform(),
-					pbp ? pbp->get_global_transform() : Transform(),
+					pb->get_global_transform(),
+					pbp->get_global_transform(),
 					hjd->angular_limit_lower,
 					hjd->angular_limit_upper,
 					hjd->angular_limit_enabled,
 					points,
-					pb ? &points : NULL,
-					pbp ? &points : NULL);
+					&points,
+					&points);
 		} break;
 		case PhysicalBone::JOINT_TYPE_SLIDER: {
 
@@ -1863,15 +1859,15 @@ void PhysicalBoneSpatialGizmoPlugin::redraw(EditorSpatialGizmo *p_gizmo) {
 			JointSpatialGizmoPlugin::CreateSliderJointGizmo(
 					physical_bone->get_joint_offset(),
 					physical_bone->get_global_transform() * physical_bone->get_joint_offset(),
-					pb ? pb->get_global_transform() : Transform(),
-					pbp ? pbp->get_global_transform() : Transform(),
+					pb->get_global_transform(),
+					pbp->get_global_transform(),
 					sjd->angular_limit_lower,
 					sjd->angular_limit_upper,
 					sjd->linear_limit_lower,
 					sjd->linear_limit_upper,
 					points,
-					pb ? &points : NULL,
-					pbp ? &points : NULL);
+					&points,
+					&points);
 		} break;
 		case PhysicalBone::JOINT_TYPE_6DOF: {
 
@@ -1880,8 +1876,8 @@ void PhysicalBoneSpatialGizmoPlugin::redraw(EditorSpatialGizmo *p_gizmo) {
 					physical_bone->get_joint_offset(),
 
 					physical_bone->get_global_transform() * physical_bone->get_joint_offset(),
-					pb ? pb->get_global_transform() : Transform(),
-					pbp ? pbp->get_global_transform() : Transform(),
+					pb->get_global_transform(),
+					pbp->get_global_transform(),
 
 					sdofjd->axis_data[0].angular_limit_lower,
 					sdofjd->axis_data[0].angular_limit_upper,
@@ -1905,8 +1901,8 @@ void PhysicalBoneSpatialGizmoPlugin::redraw(EditorSpatialGizmo *p_gizmo) {
 					sdofjd->axis_data[2].linear_limit_enabled,
 
 					points,
-					pb ? &points : NULL,
-					pbp ? &points : NULL);
+					&points,
+					&points);
 		} break;
 		default:
 			return;

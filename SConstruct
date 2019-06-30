@@ -339,14 +339,13 @@ if selected_platform in platform_list:
                 shadow_local_warning = ['-Wshadow-local']
 
         if (env["warnings"] == 'extra'):
-            # FIXME: enable -Wclobbered once #26351 is fixed
             # Note: enable -Wimplicit-fallthrough for Clang (already part of -Wextra for GCC)
             # once we switch to C++11 or later (necessary for our FALLTHROUGH macro).
             env.Append(CCFLAGS=['-Wall', '-Wextra', '-Wno-unused-parameter']
                 + all_plus_warnings + shadow_local_warning)
             env.Append(CXXFLAGS=['-Wctor-dtor-privacy', '-Wnon-virtual-dtor'])
             if methods.using_gcc(env):
-                env.Append(CCFLAGS=['-Wno-clobbered', '-Walloc-zero',
+                env.Append(CCFLAGS=['-Walloc-zero',
                     '-Wduplicated-branches', '-Wduplicated-cond',
                     '-Wstringop-overflow=4', '-Wlogical-op'])
                 env.Append(CXXFLAGS=['-Wnoexcept', '-Wplacement-new=1'])
@@ -400,6 +399,7 @@ if selected_platform in platform_list:
     sys.modules.pop('detect')
 
     env.module_list = []
+    env.module_icons_paths = []
     env.doc_class_path = {}
 
     for x in module_list:
@@ -422,13 +422,22 @@ if selected_platform in platform_list:
         if (can_build):
             config.configure(env)
             env.module_list.append(x)
+            
+            # Get doc classes paths (if present)
             try:
-                 doc_classes = config.get_doc_classes()
-                 doc_path = config.get_doc_path()
-                 for c in doc_classes:
-                     env.doc_class_path[c] = "modules/" + x + "/" + doc_path
+                doc_classes = config.get_doc_classes()
+                doc_path = config.get_doc_path()
+                for c in doc_classes:
+                    env.doc_class_path[c] = "modules/" + x + "/" + doc_path
             except:
                 pass
+            # Get icon paths (if present)
+            try:
+                icons_path = config.get_icons_path()
+                env.module_icons_paths.append("modules/" + x + "/" + icons_path)
+            except:
+                # Default path for module icons
+                env.module_icons_paths.append("modules/" + x + "/" + "icons")
 
         sys.path.remove(tmppath)
         sys.modules.pop('config')

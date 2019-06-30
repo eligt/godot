@@ -720,7 +720,7 @@ Error ResourceInteractiveLoaderBinary::poll() {
 		error = ERR_FILE_CORRUPT;
 		memdelete(obj); //bye
 		ERR_EXPLAIN(local_path + ":Resource type in resource field not a resource, type is: " + obj->get_class());
-		ERR_FAIL_COND_V(!r, ERR_FILE_CORRUPT);
+		ERR_FAIL_V(ERR_FILE_CORRUPT);
 	}
 
 	RES res = RES(r);
@@ -991,10 +991,7 @@ Ref<ResourceInteractiveLoader> ResourceFormatLoaderBinary::load_interactive(cons
 	Error err;
 	FileAccess *f = FileAccess::open(p_path, FileAccess::READ, &err);
 
-	if (err != OK) {
-
-		ERR_FAIL_COND_V(err != OK, Ref<ResourceInteractiveLoader>());
-	}
+	ERR_FAIL_COND_V(err != OK, Ref<ResourceInteractiveLoader>());
 
 	Ref<ResourceInteractiveLoaderBinary> ria = memnew(ResourceInteractiveLoaderBinary);
 	String path = p_original_path != "" ? p_original_path : p_path;
@@ -1129,9 +1126,8 @@ Error ResourceFormatLoaderBinary::rename_dependencies(const String &p_path, cons
 
 		Error err;
 		f = FileAccess::open(p_path, FileAccess::READ, &err);
-		if (err != OK) {
-			ERR_FAIL_COND_V(err != OK, ERR_FILE_CANT_OPEN);
-		}
+
+		ERR_FAIL_COND_V(err != OK, ERR_FILE_CANT_OPEN);
 
 		Ref<ResourceInteractiveLoaderBinary> ria = memnew(ResourceInteractiveLoaderBinary);
 		ria->local_path = ProjectSettings::get_singleton()->localize_path(p_path);
@@ -1698,7 +1694,7 @@ void ResourceFormatSaverBinaryInstance::_find_resources(const Variant &p_variant
 			int len = varray.size();
 			for (int i = 0; i < len; i++) {
 
-				Variant v = varray.get(i);
+				const Variant &v = varray.get(i);
 				_find_resources(v);
 			}
 

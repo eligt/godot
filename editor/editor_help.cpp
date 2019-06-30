@@ -48,9 +48,9 @@ void EditorHelp::_init_colors() {
 	text_color = get_color("default_color", "RichTextLabel");
 	headline_color = get_color("headline_color", "EditorHelp");
 	base_type_color = title_color.linear_interpolate(text_color, 0.5);
-	comment_color = text_color * Color(1, 1, 1, 0.6);
+	comment_color = text_color * Color(1, 1, 1, 0.4);
 	symbol_color = comment_color;
-	value_color = text_color * Color(1, 1, 1, 0.4);
+	value_color = text_color * Color(1, 1, 1, 0.6);
 	qualifier_color = text_color * Color(1, 1, 1, 0.8);
 	type_color = get_color("accent_color", "Editor").linear_interpolate(text_color, 0.5);
 	class_desc->add_color_override("selection_color", get_color("accent_color", "Editor") * Color(1, 1, 1, 0.4));
@@ -258,9 +258,11 @@ void EditorHelp::_add_method(const DocData::MethodDoc &p_method, bool p_overview
 		if (p_method.arguments[j].default_value != "") {
 
 			class_desc->push_color(symbol_color);
-			class_desc->add_text("=");
+			class_desc->add_text(" = ");
 			class_desc->pop();
+			class_desc->push_color(value_color);
 			_add_text(_fix_constant(p_method.arguments[j].default_value));
+			class_desc->pop();
 		}
 
 		class_desc->pop();
@@ -389,7 +391,6 @@ void EditorHelp::_update_doc() {
 				if (prev) {
 
 					class_desc->add_text(" , ");
-					prev = false;
 				}
 
 				_add_type(E->get().name);
@@ -414,7 +415,7 @@ void EditorHelp::_update_doc() {
 		class_desc->add_text(TTR("Brief Description:"));
 		class_desc->pop();
 		class_desc->pop();
-		
+
 		class_desc->add_newline();
 		class_desc->add_newline();
 		class_desc->push_color(text_color);
@@ -441,7 +442,7 @@ void EditorHelp::_update_doc() {
 		class_desc->add_text(TTR("Properties:"));
 		class_desc->pop();
 		class_desc->pop();
-		
+
 		class_desc->add_newline();
 		class_desc->push_indent(1);
 		class_desc->push_table(2);
@@ -472,21 +473,35 @@ void EditorHelp::_update_doc() {
 			if (cd.properties[i].description != "") {
 				describe = true;
 			}
+
 			class_desc->push_cell();
+			class_desc->push_font(doc_code_font);
+			class_desc->push_color(headline_color);
+
 			if (describe) {
 				class_desc->push_meta("@member " + cd.properties[i].name);
 			}
 
-			class_desc->push_font(doc_code_font);
-			class_desc->push_color(headline_color);
 			_add_text(cd.properties[i].name);
-			
+
 			class_desc->pop();
 			class_desc->pop();
-			
+
 			if (describe) {
 				class_desc->pop();
 				property_descr = true;
+			}
+
+			if (cd.properties[i].default_value != "") {
+				class_desc->push_color(symbol_color);
+				class_desc->add_text(" [default: ");
+				class_desc->pop();
+				class_desc->push_color(value_color);
+				_add_text(_fix_constant(cd.properties[i].default_value));
+				class_desc->pop();
+				class_desc->push_color(symbol_color);
+				class_desc->add_text("]");
+				class_desc->pop();
 			}
 
 			class_desc->pop();
@@ -521,7 +536,7 @@ void EditorHelp::_update_doc() {
 		class_desc->add_text(TTR("Methods:"));
 		class_desc->pop();
 		class_desc->pop();
-		
+
 		class_desc->add_newline();
 		class_desc->push_font(doc_code_font);
 		class_desc->push_indent(1);
@@ -544,7 +559,6 @@ void EditorHelp::_update_doc() {
 				class_desc->pop(); //cell
 				class_desc->push_cell();
 				class_desc->pop(); //cell
-				any_previous = false;
 			}
 
 			String group_prefix;
@@ -615,6 +629,19 @@ void EditorHelp::_update_doc() {
 			class_desc->push_color(headline_color);
 			_add_text(cd.theme_properties[i].name);
 			class_desc->pop();
+
+			if (cd.theme_properties[i].default_value != "") {
+				class_desc->push_color(symbol_color);
+				class_desc->add_text(" [default: ");
+				class_desc->pop();
+				class_desc->push_color(value_color);
+				_add_text(_fix_constant(cd.theme_properties[i].default_value));
+				class_desc->pop();
+				class_desc->push_color(symbol_color);
+				class_desc->add_text("]");
+				class_desc->pop();
+			}
+
 			class_desc->pop();
 
 			if (cd.theme_properties[i].description != "") {
@@ -673,7 +700,7 @@ void EditorHelp::_update_doc() {
 				if (cd.signals[i].arguments[j].default_value != "") {
 
 					class_desc->push_color(symbol_color);
-					class_desc->add_text("=");
+					class_desc->add_text(" = ");
 					class_desc->pop();
 					_add_text(cd.signals[i].arguments[j].default_value);
 				}
@@ -779,7 +806,7 @@ void EditorHelp::_update_doc() {
 					class_desc->add_text(" = ");
 					class_desc->pop();
 					class_desc->push_color(value_color);
-					_add_text(enum_list[i].value);
+					_add_text(_fix_constant(enum_list[i].value));
 					class_desc->pop();
 					class_desc->pop();
 					if (enum_list[i].description != "") {
@@ -845,7 +872,7 @@ void EditorHelp::_update_doc() {
 				class_desc->add_text(" = ");
 				class_desc->pop();
 				class_desc->push_color(value_color);
-				_add_text(constants[i].value);
+				_add_text(_fix_constant(constants[i].value));
 				class_desc->pop();
 
 				class_desc->pop();
@@ -878,7 +905,7 @@ void EditorHelp::_update_doc() {
 		class_desc->add_text(TTR("Class Description:"));
 		class_desc->pop();
 		class_desc->pop();
-		
+
 		class_desc->add_newline();
 		class_desc->add_newline();
 		class_desc->push_color(text_color);
@@ -965,6 +992,21 @@ void EditorHelp::_update_doc() {
 			class_desc->push_color(headline_color);
 			_add_text(cd.properties[i].name);
 			class_desc->pop(); // color
+
+			if (cd.properties[i].default_value != "") {
+				class_desc->push_color(symbol_color);
+				class_desc->add_text(" [default: ");
+				class_desc->pop(); // color
+
+				class_desc->push_color(value_color);
+				_add_text(_fix_constant(cd.properties[i].default_value));
+				class_desc->pop(); // color
+
+				class_desc->push_color(symbol_color);
+				class_desc->add_text("]");
+				class_desc->pop(); // color
+			}
+
 			class_desc->pop(); // font
 			class_desc->pop(); // cell
 
@@ -1003,7 +1045,7 @@ void EditorHelp::_update_doc() {
 			}
 
 			class_desc->pop(); // table
-			
+
 			class_desc->add_newline();
 			class_desc->add_newline();
 
@@ -1049,7 +1091,7 @@ void EditorHelp::_update_doc() {
 
 			class_desc->add_newline();
 			class_desc->add_newline();
-			
+
 			class_desc->push_color(text_color);
 			class_desc->push_font(doc_font);
 			class_desc->push_indent(1);

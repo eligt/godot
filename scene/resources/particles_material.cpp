@@ -184,7 +184,8 @@ void ParticlesMaterial::_update_shader() {
 		} break;
 		case EMISSION_SHAPE_DIRECTED_POINTS: {
 			code += "uniform sampler2D emission_texture_normal : hint_black;\n";
-		} //fallthrough
+			FALLTHROUGH;
+		}
 		case EMISSION_SHAPE_POINTS: {
 			code += "uniform sampler2D emission_texture_points : hint_black;\n";
 			code += "uniform int emission_texture_point_count;\n";
@@ -1202,6 +1203,7 @@ ParticlesMaterial::ParticlesMaterial() :
 	set_spread(45);
 	set_flatness(0);
 	set_param(PARAM_INITIAL_LINEAR_VELOCITY, 0);
+	set_param(PARAM_ANGULAR_VELOCITY, 0);
 	set_param(PARAM_ORBIT_VELOCITY, 0);
 	set_param(PARAM_LINEAR_ACCEL, 0);
 	set_param(PARAM_RADIAL_ACCEL, 0);

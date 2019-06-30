@@ -126,7 +126,7 @@ void ColorPicker::_update_controls() {
 	}
 }
 
-void ColorPicker::set_pick_color(const Color &p_color, bool p_update_sliders) {
+void ColorPicker::_set_pick_color(const Color &p_color, bool p_update_sliders) {
 
 	color = p_color;
 	if (color != last_hsv) {
@@ -140,6 +140,11 @@ void ColorPicker::set_pick_color(const Color &p_color, bool p_update_sliders) {
 		return;
 
 	_update_color(p_update_sliders);
+}
+
+void ColorPicker::set_pick_color(const Color &p_color) {
+
+	_set_pick_color(p_color, true); //because setters can't have more arguments
 }
 
 void ColorPicker::set_edit_alpha(bool p_show) {
@@ -168,14 +173,14 @@ void ColorPicker::_value_changed(double) {
 		color.set_hsv(scroll[0]->get_value() / 360.0,
 				scroll[1]->get_value() / 100.0,
 				scroll[2]->get_value() / 100.0,
-				scroll[3]->get_value() / 100.0);
+				scroll[3]->get_value() / 255.0);
 	} else {
 		for (int i = 0; i < 4; i++) {
 			color.components[i] = scroll[i]->get_value() / (raw_mode_enabled ? 1.0 : 255.0);
 		}
 	}
 
-	set_pick_color(color, false);
+	_set_pick_color(color, false);
 	emit_signal("color_changed", color);
 }
 
@@ -204,17 +209,17 @@ void ColorPicker::_update_color(bool p_update_sliders) {
 
 		if (hsv_mode_enabled) {
 			for (int i = 0; i < 4; i++) {
-				scroll[i]->set_step(0.1);
+				scroll[i]->set_step(1.0);
 			}
 
-			scroll[0]->set_max(360);
+			scroll[0]->set_max(359);
 			scroll[0]->set_value(h * 360.0);
 			scroll[1]->set_max(100);
 			scroll[1]->set_value(s * 100.0);
 			scroll[2]->set_max(100);
 			scroll[2]->set_value(v * 100.0);
-			scroll[3]->set_max(100);
-			scroll[3]->set_value(color.components[3] * 100.0);
+			scroll[3]->set_max(255);
+			scroll[3]->set_value(color.components[3] * 255.0);
 		} else {
 			for (int i = 0; i < 4; i++) {
 				if (raw_mode_enabled) {

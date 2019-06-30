@@ -76,7 +76,7 @@ RES _ResourceLoader::load(const String &p_path, const String &p_type_hint, bool 
 
 	if (err != OK) {
 		ERR_EXPLAIN("Error loading resource: '" + p_path + "'");
-		ERR_FAIL_COND_V(err != OK, ret);
+		ERR_FAIL_V(ret);
 	}
 	return ret;
 }
@@ -1317,6 +1317,26 @@ void _OS::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::VECTOR2, "window_position"), "set_window_position", "get_window_position");
 	ADD_PROPERTY(PropertyInfo(Variant::VECTOR2, "window_size"), "set_window_size", "get_window_size");
 
+	// Those default values need to be specified for the docs generator,
+	// to avoid using values from the documentation writer's own OS instance.
+	ADD_PROPERTY_DEFAULT("clipboard", "");
+	ADD_PROPERTY_DEFAULT("current_screen", 0);
+	ADD_PROPERTY_DEFAULT("exit_code", 0);
+	ADD_PROPERTY_DEFAULT("vsync_enabled", true);
+	ADD_PROPERTY_DEFAULT("low_processor_usage_mode", false);
+	ADD_PROPERTY_DEFAULT("keep_screen_on", true);
+	ADD_PROPERTY_DEFAULT("min_window_size", Vector2());
+	ADD_PROPERTY_DEFAULT("max_window_size", Vector2());
+	ADD_PROPERTY_DEFAULT("screen_orientation", 0);
+	ADD_PROPERTY_DEFAULT("window_borderless", false);
+	ADD_PROPERTY_DEFAULT("window_per_pixel_transparency_enabled", false);
+	ADD_PROPERTY_DEFAULT("window_fullscreen", false);
+	ADD_PROPERTY_DEFAULT("window_maximized", false);
+	ADD_PROPERTY_DEFAULT("window_minimized", false);
+	ADD_PROPERTY_DEFAULT("window_resizable", true);
+	ADD_PROPERTY_DEFAULT("window_position", Vector2());
+	ADD_PROPERTY_DEFAULT("window_size", Vector2());
+
 	BIND_ENUM_CONSTANT(VIDEO_DRIVER_GLES2);
 	BIND_ENUM_CONSTANT(VIDEO_DRIVER_GLES3);
 
@@ -1524,6 +1544,11 @@ bool _Geometry::is_polygon_clockwise(const Vector<Vector2> &p_polygon) {
 	return Geometry::is_polygon_clockwise(p_polygon);
 }
 
+bool _Geometry::is_point_in_polygon(const Point2 &p_point, const Vector<Vector2> &p_polygon) {
+
+	return Geometry::is_point_in_polygon(p_point, p_polygon);
+}
+
 Vector<int> _Geometry::triangulate_polygon(const Vector<Vector2> &p_polygon) {
 
 	return Geometry::triangulate_polygon(p_polygon);
@@ -1706,6 +1731,7 @@ void _Geometry::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("point_is_inside_triangle", "point", "a", "b", "c"), &_Geometry::point_is_inside_triangle);
 
 	ClassDB::bind_method(D_METHOD("is_polygon_clockwise", "polygon"), &_Geometry::is_polygon_clockwise);
+	ClassDB::bind_method(D_METHOD("is_point_in_polygon", "point", "polygon"), &_Geometry::is_point_in_polygon);
 	ClassDB::bind_method(D_METHOD("triangulate_polygon", "polygon"), &_Geometry::triangulate_polygon);
 	ClassDB::bind_method(D_METHOD("triangulate_delaunay_2d", "points"), &_Geometry::triangulate_delaunay_2d);
 	ClassDB::bind_method(D_METHOD("convex_hull_2d", "points"), &_Geometry::convex_hull_2d);
