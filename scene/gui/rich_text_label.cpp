@@ -1,4 +1,4 @@
-/*************************************************************************/
+﻿/*************************************************************************/
 /*  rich_text_label.cpp                                                  */
 /*************************************************************************/
 /*                       This file is part of:                           */
@@ -230,6 +230,7 @@ int RichTextLabel::_process_line(ItemFrame *p_frame, const Vector2 &p_ofs, int &
 			l.ascent_caches.push_back(line_ascent);                                                                                                             \
 			l.descent_caches.push_back(line_descent);                                                                                                           \
 			l.space_caches.push_back(spaces);                                                                                                                   \
+	    wofs = begin;                                                                                                                                        \
 		}                                                                                                                                                       \
 		line_wrapped = false;                                                                                                                                   \
 		y += line_height + get_constant(SceneStringNames::get_singleton()->line_separation);                                                                    \
@@ -238,7 +239,6 @@ int RichTextLabel::_process_line(ItemFrame *p_frame, const Vector2 &p_ofs, int &
 		line_descent = 0;                                                                                                                                       \
 		spaces = 0;                                                                                                                                             \
 		spaces_size = 0;                                                                                                                                        \
-		wofs = begin;                                                                                                                                           \
 		align_ofs = 0;                                                                                                                                          \
 		if (p_mode != PROCESS_CACHE) {                                                                                                                          \
 			lh = line < l.height_caches.size() ? l.height_caches[line] : 1;                                                                                     \
@@ -257,7 +257,7 @@ int RichTextLabel::_process_line(ItemFrame *p_frame, const Vector2 &p_ofs, int &
 	if (p_mode == PROCESS_CACHE) {                                                                                                                              \
 		l.maximum_width = MAX(l.maximum_width, MIN(p_width, wofs + m_width));                                                                                   \
 		l.minimum_width = MAX(l.minimum_width, m_width);                                                                                                        \
-	}                                                                                                                                                           \
+	}                                                                                                                                                          \
 	if (wofs + m_width > p_width) {                                                                                                                             \
 		line_wrapped = true;                                                                                                                                    \
 		if (p_mode == PROCESS_CACHE) {                                                                                                                          \
@@ -323,7 +323,16 @@ int RichTextLabel::_process_line(ItemFrame *p_frame, const Vector2 &p_ofs, int &
 				if (it != l.from) {
 					ItemIndent *indent_it = static_cast<ItemIndent *>(it);
 					
-					int indent = indent_it->level * tab_size * cfont->get_char_size(' ').width;
+					Ref<Font> font = _find_font(it);
+					if (font.is_null())
+						font = p_base_font;
+	
+					real_t font_size = _find_size(it);
+					real_t font_scale = cfont_scale;
+					if (font_size > 0)
+						font_scale = (real_t)font_size / font->get_height();
+					
+					int indent = indent_it->level * tab_size * Math::round(cfont->get_char_size(' ').width * font_scale);
 					margin += indent;
 					begin += indent;
 					wofs += indent;
@@ -345,8 +354,8 @@ int RichTextLabel::_process_line(ItemFrame *p_frame, const Vector2 &p_ofs, int &
 
 				const CharType *c = text->text.c_str();
 				const CharType *cf = c;
-				int ascent = font->get_ascent() * font_scale;
-				int descent = font->get_descent() * font_scale;
+				int ascent = Math::round(font->get_ascent() * font_scale);
+				int descent = Math::round(font->get_descent() * font_scale);
 
 				Color color;
 				Color font_color_shadow;
@@ -384,9 +393,9 @@ int RichTextLabel::_process_line(ItemFrame *p_frame, const Vector2 &p_ofs, int &
 					}
 					while (c[end] != 0 && !(end && c[end - 1] == ' ' && c[end] != ' ')) {
 
-						int cw = font->get_char_size(c[end], c[end + 1]).width * font_scale;
+						int cw = Math::round(font->get_char_size(c[end], c[end + 1]).width * font_scale);
 						if (c[end] == '\t') {
-							cw = tab_size * font->get_char_size(' ').width * font_scale;
+							cw = Math::round(tab_size * font->get_char_size(' ').width * font_scale);
 						}
 
 						if (end > 0 && w + cw + begin > p_width) {
@@ -407,7 +416,7 @@ int RichTextLabel::_process_line(ItemFrame *p_frame, const Vector2 &p_ofs, int &
 
 					if (end && c[end - 1] == ' ') {
 						if (p_mode == PROCESS_CACHE) {
-							spaces_size += font->get_char_size(' ').width * font_scale;
+							spaces_size += Math::round(font->get_char_size(' ').width * font_scale);
 						} else if (align == ALIGN_FILL) {
 							int ln = MIN(l.offset_caches.size() - 1, line);
 							if (l.space_caches[ln]) {
@@ -427,10 +436,10 @@ int RichTextLabel::_process_line(ItemFrame *p_frame, const Vector2 &p_ofs, int &
 							if (p_mode == PROCESS_POINTER && r_click_char && p_click_pos.y >= p_ofs.y + y && p_click_pos.y <= p_ofs.y + y + lh) {
 								//int o = (wofs+w)-p_click_pos.x;
 
-								int cw = font->get_char_size(c[i], c[i + 1]).x * font_scale;
+								int cw = Math::round(font->get_char_size(c[i], c[i + 1]).x * font_scale);
 
 								if (c[i] == '\t') {
-									cw = tab_size * font->get_char_size(' ').width * font_scale;
+									cw = tab_size * Math::round(font->get_char_size(' ').width * font_scale);
 								}
 
 								if (p_click_pos.x - cw / 2 > p_ofs.x + align_ofs + pofs) {
@@ -461,7 +470,7 @@ int RichTextLabel::_process_line(ItemFrame *p_frame, const Vector2 &p_ofs, int &
 
 								if (visible) {
 									if (selected) {
-										cw = font->get_char_size(c[i], c[i + 1]).x * font_scale;
+										cw = Math::round(font->get_char_size(c[i], c[i + 1]).x * font_scale);
 										draw_rect(Rect2(p_ofs.x + pofs, p_ofs.y + y, cw, lh), selection_bg);
 									}
 
@@ -487,7 +496,7 @@ int RichTextLabel::_process_line(ItemFrame *p_frame, const Vector2 &p_ofs, int &
 
 								p_char_count++;
 								if (c[i] == '\t') {
-									cw = tab_size * font->get_char_size(' ').width * font_scale;
+									cw = tab_size * Math::round(font->get_char_size(' ').width * font_scale);
 								}
 
 								ofs += cw;
@@ -545,17 +554,17 @@ int RichTextLabel::_process_line(ItemFrame *p_frame, const Vector2 &p_ofs, int &
 
 				ENSURE_WIDTH(img->image->get_width());
 
-				bool visible = visible_characters < 0 || (p_char_count < visible_characters && YRANGE_VISIBLE(y + lh - font->get_descent() * font_scale - img->image->get_height(), img->image->get_height()));
+				bool visible = visible_characters < 0 || (p_char_count < visible_characters && YRANGE_VISIBLE(y + lh - Math::round(font->get_descent() * font_scale) - img->image->get_height(), img->image->get_height()));
 				if (visible)
 					line_is_blank = false;
 
 				if (p_mode == PROCESS_DRAW && visible) {
-					img->image->draw(ci, p_ofs + Point2(align_ofs + wofs, y + lh - font->get_descent() * font_scale - img->image->get_height()));
+					img->image->draw(ci, p_ofs + Point2(align_ofs + wofs, y + lh - Math::round(font->get_descent() * font_scale) - img->image->get_height()));
 				}
 				p_char_count++;
 
 				ADVANCE(img->image->get_width());
-				CHECK_HEIGHT((img->image->get_height() + font->get_descent() * font_scale));
+				CHECK_HEIGHT((img->image->get_height() + Math::round(font->get_descent() * font_scale)));
 
 			} break;
 			case ITEM_NEWLINE: {
@@ -1243,7 +1252,7 @@ int RichTextLabel::_find_margin(Item *p_item, const Ref<Font> &p_base_font) {
 
 			ItemIndent *indent = static_cast<ItemIndent *>(item);
 
-			margin += indent->level * tab_size * font->get_char_size(' ').width * font_scale;
+			margin += indent->level * tab_size * Math::round(font->get_char_size(' ').width * font_scale);
 
 		} else if (item->type == ITEM_LIST) {
 
@@ -1353,7 +1362,7 @@ bool RichTextLabel::_find_meta(Item *p_item, Variant *r_meta, ItemMeta **r_item)
 bool RichTextLabel::_find_layout_subitem(Item* from, Item* to) {
 	
 	if (from && from != to) {
-		if (from->type != ITEM_FONT && from->type != ITEM_COLOR && from->type != ITEM_UNDERLINE && from->type != ITEM_STRIKETHROUGH)
+		if (from->type != ITEM_FONT && from->type != ITEM_SIZE && from->type != ITEM_COLOR && from->type != ITEM_UNDERLINE && from->type != ITEM_STRIKETHROUGH)
 			return true;
 		
 		for (List<Item *>::Element *E = from->subitems.front(); E; E = E->next()) {
@@ -2133,7 +2142,7 @@ bool RichTextLabel::search(const String &p_string, bool p_from_selection, bool p
 				if (font_size > 0)
 					font_scale = (real_t)font_size / font->get_height();
 
-				int fh = font->get_height() * font_scale;
+				int fh = Math::round(font->get_height() * font_scale);
 
 				float offset = 0;
 
