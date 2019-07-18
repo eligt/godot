@@ -212,7 +212,7 @@ NetSocketPosix::NetError NetSocketPosix::_get_socket_error() {
 #pragma GCC diagnostic pop
 #endif
 
-bool NetSocketPosix::_can_use_ip(const IP_Address p_ip, const bool p_for_bind) const {
+bool NetSocketPosix::_can_use_ip(const IP_Address &p_ip, const bool p_for_bind) const {
 
 	if (p_for_bind && !(p_ip.is_valid() || p_ip.is_wildcard())) {
 		return false;
@@ -684,10 +684,10 @@ Ref<NetSocket> NetSocketPosix::accept(IP_Address &r_ip, uint16_t &r_port) {
 	return Ref<NetSocket>(ns);
 }
 
-Error NetSocketPosix::join_multicast_group(const IP_Address &p_ip, String p_if_name) {
-	return _change_multicast_group(p_ip, p_if_name, true);
+Error NetSocketPosix::join_multicast_group(const IP_Address &p_multi_address, String p_if_name) {
+	return _change_multicast_group(p_multi_address, p_if_name, true);
 }
 
-Error NetSocketPosix::leave_multicast_group(const IP_Address &p_ip, String p_if_name) {
-	return _change_multicast_group(p_ip, p_if_name, false);
+Error NetSocketPosix::leave_multicast_group(const IP_Address &p_multi_address, String p_if_name) {
+	return _change_multicast_group(p_multi_address, p_if_name, false);
 }

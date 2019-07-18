@@ -999,6 +999,8 @@ void LineEdit::set_cursor_at_pixel_pos(int p_x) {
 	Ref<StyleBox> style = get_stylebox("normal");
 	int pixel_ofs = 0;
 	Size2 size = get_size();
+	bool display_clear_icon = !text.empty() && is_editable() && clear_button_enabled;
+	int r_icon_width = Control::get_icon("clear")->get_width();
 
 	switch (align) {
 
@@ -1013,10 +1015,16 @@ void LineEdit::set_cursor_at_pixel_pos(int p_x) {
 				pixel_ofs = int(style->get_offset().x);
 			else
 				pixel_ofs = int(size.width - (cached_width)) / 2;
+
+			if (display_clear_icon)
+				pixel_ofs -= int(r_icon_width / 2 + style->get_margin(MARGIN_RIGHT));
 		} break;
 		case ALIGN_RIGHT: {
 
 			pixel_ofs = int(size.width - style->get_margin(MARGIN_RIGHT) - (cached_width));
+
+			if (display_clear_icon)
+				pixel_ofs -= int(r_icon_width + style->get_margin(MARGIN_RIGHT));
 		} break;
 	}
 
@@ -1191,7 +1199,7 @@ void LineEdit::set_cursor_position(int p_pos) {
 	if (cursor_pos <= window_pos) {
 		/* Adjust window if cursor goes too much to the left */
 		set_window_pos(MAX(0, cursor_pos - 1));
-	} else if (cursor_pos > window_pos) {
+	} else {
 		/* Adjust window if cursor goes too much to the right */
 		int window_width = get_size().width - style->get_minimum_size().width;
 		bool display_clear_icon = !text.empty() && is_editable() && clear_button_enabled;

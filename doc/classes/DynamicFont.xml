@@ -40,6 +40,14 @@
 				Returns the number of fallback fonts.
 			</description>
 		</method>
+		<method name="get_spacing" qualifiers="const">
+			<return type="int">
+			</return>
+			<argument index="0" name="type" type="int">
+			</argument>
+			<description>
+			</description>
+		</method>
 		<method name="remove_fallback">
 			<return type="void">
 			</return>
@@ -60,6 +68,16 @@
 				Sets the fallback font at index [code]idx[/code].
 			</description>
 		</method>
+		<method name="set_spacing">
+			<return type="void">
+			</return>
+			<argument index="0" name="type" type="int">
+			</argument>
+			<argument index="1" name="value" type="int">
+			</argument>
+			<description>
+			</description>
+		</method>
 	</methods>
 	<members>
 		<member name="extra_spacing_bottom" type="int" setter="set_spacing" getter="get_spacing" default="0">
@@ -74,7 +92,7 @@
 		<member name="extra_spacing_top" type="int" setter="set_spacing" getter="get_spacing" default="0">
 			Extra spacing at the top in pixels.
 		</member>
-		<member name="font_data" type="DynamicFontData" setter="set_font_data" getter="get_font_data" default="null">
+		<member name="font_data" type="DynamicFontData" setter="set_font_data" getter="get_font_data">
 			The font data.
 		</member>
 		<member name="outline_color" type="Color" setter="set_outline_color" getter="get_outline_color" default="Color( 1, 1, 1, 1 )">

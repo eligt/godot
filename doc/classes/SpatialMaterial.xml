@@ -10,12 +10,66 @@
 		<link>https://docs.godotengine.org/en/latest/tutorials/3d/spatial_material.html</link>
 	</tutorials>
 	<methods>
+		<method name="get_feature" qualifiers="const">
+			<return type="bool">
+			</return>
+			<argument index="0" name="feature" type="int" enum="SpatialMaterial.Feature">
+			</argument>
+			<description>
+			</description>
+		</method>
+		<method name="get_flag" qualifiers="const">
+			<return type="bool">
+			</return>
+			<argument index="0" name="flag" type="int" enum="SpatialMaterial.Flags">
+			</argument>
+			<description>
+			</description>
+		</method>
+		<method name="get_texture" qualifiers="const">
+			<return type="Texture">
+			</return>
+			<argument index="0" name="param" type="int" enum="SpatialMaterial.TextureParam">
+			</argument>
+			<description>
+			</description>
+		</method>
+		<method name="set_feature">
+			<return type="void">
+			</return>
+			<argument index="0" name="feature" type="int" enum="SpatialMaterial.Feature">
+			</argument>
+			<argument index="1" name="enable" type="bool">
+			</argument>
+			<description>
+			</description>
+		</method>
+		<method name="set_flag">
+			<return type="void">
+			</return>
+			<argument index="0" name="flag" type="int" enum="SpatialMaterial.Flags">
+			</argument>
+			<argument index="1" name="enable" type="bool">
+			</argument>
+			<description>
+			</description>
+		</method>
+		<method name="set_texture">
+			<return type="void">
+			</return>
+			<argument index="0" name="param" type="int" enum="SpatialMaterial.TextureParam">
+			</argument>
+			<argument index="1" name="texture" type="Texture">
+			</argument>
+			<description>
+			</description>
+		</method>
 	</methods>
 	<members>
 		<member name="albedo_color" type="Color" setter="set_albedo" getter="get_albedo" default="Color( 1, 1, 1, 1 )">
 			The material's base color.
 		</member>
-		<member name="albedo_texture" type="Texture" setter="set_texture" getter="get_texture" default="null">
+		<member name="albedo_texture" type="Texture" setter="set_texture" getter="get_texture">
 		</member>
 		<member name="anisotropy" type="float" setter="set_anisotropy" getter="get_anisotropy">
 			The strength of the anisotropy effect.
@@ -136,7 +190,7 @@
 			General reflectivity amount.
 			[b]Note:[/b] unlike [member metallic], this is not energy-conserving, so it should be left at [code]0.5[/code] in most cases. See also [member roughness].
 		</member>
-		<member name="metallic_texture" type="Texture" setter="set_texture" getter="get_texture" default="null">
+		<member name="metallic_texture" type="Texture" setter="set_texture" getter="get_texture">
 		</member>
 		<member name="metallic_texture_channel" type="int" setter="set_metallic_texture_channel" getter="get_metallic_texture_channel" enum="SpatialMaterial.TextureChannel" default="2">
 		</member>
@@ -221,7 +275,7 @@
 		<member name="roughness" type="float" setter="set_roughness" getter="get_roughness" default="1.0">
 			Surface reflection. A value of [code]0[/code] represents a perfect mirror while a value of [code]1[/code] completely blurs the reflection. See also [member metallic].
 		</member>
-		<member name="roughness_texture" type="Texture" setter="set_texture" getter="get_texture" default="null">
+		<member name="roughness_texture" type="Texture" setter="set_texture" getter="get_texture">
 		</member>
 		<member name="roughness_texture_channel" type="int" setter="set_roughness_texture_channel" getter="get_roughness_texture_channel" enum="SpatialMaterial.TextureChannel" default="1">
 		</member>

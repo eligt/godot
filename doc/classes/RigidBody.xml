@@ -82,12 +82,30 @@
 				Applies a torque impulse which will be affected by the body mass and shape. This will rotate the body around the [code]impulse[/code] vector passed.
 			</description>
 		</method>
+		<method name="get_axis_lock" qualifiers="const">
+			<return type="bool">
+			</return>
+			<argument index="0" name="axis" type="int" enum="PhysicsServer.BodyAxis">
+			</argument>
+			<description>
+			</description>
+		</method>
 		<method name="get_colliding_bodies" qualifiers="const">
 			<return type="Array">
 			</return>
 			<description>
 				Returns a list of the bodies colliding with this one. By default, number of max contacts reported is at 0, see the [member contacts_reported] property to increase it.
 				[b]Note:[/b] The result of this test is not immediate after moving objects. For performance, list of collisions is updated once per frame and before the physics step. Consider using signals instead.
+			</description>
+		</method>
+		<method name="set_axis_lock">
+			<return type="void">
+			</return>
+			<argument index="0" name="axis" type="int" enum="PhysicsServer.BodyAxis">
+			</argument>
+			<argument index="1" name="lock" type="bool">
+			</argument>
+			<description>
 			</description>
 		</method>
 		<method name="set_axis_velocity">
@@ -164,7 +182,7 @@
 		<member name="mode" type="int" setter="set_mode" getter="get_mode" enum="RigidBody.Mode" default="0">
 			The body mode. See [enum Mode] for possible values.
 		</member>
-		<member name="physics_material_override" type="PhysicsMaterial" setter="set_physics_material_override" getter="get_physics_material_override" default="null">
+		<member name="physics_material_override" type="PhysicsMaterial" setter="set_physics_material_override" getter="get_physics_material_override">
 		</member>
 		<member name="sleeping" type="bool" setter="set_sleeping" getter="is_sleeping" default="false">
 			If [code]true[/code], the body is sleeping and will not calculate forces until woken up by a collision or the [code]apply_impulse[/code] method.
