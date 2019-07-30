@@ -38,6 +38,8 @@
 #include "core/safe_refcount.h"
 #include "core/ustring.h"
 
+#include <type_traits>
+
 struct MemoryPool {
 
 	//avoid accessing these directly, must be public for template access
@@ -81,7 +83,7 @@ struct MemoryPool {
 	@author Juan Linietsky <reduzio@gmail.com>
 */
 
-template <class T>
+template <class T, bool is_fundamental_type = std::is_fundamental<T>::value>
 class PoolVector {
 
 	MemoryPool::Alloc *alloc;
@@ -134,7 +136,8 @@ class PoolVector {
 		} else {
 			alloc->mem = memalloc(alloc->size);
 		}
-
+		
+		// Note: we do not check for (!is_fundamental_type) here because we're copying data, albeit maybe inefficiently
 		{
 			Write w;
 			w._ref(alloc);
@@ -157,7 +160,8 @@ class PoolVector {
 			MemoryPool::total_memory -= old_alloc->size;
 			MemoryPool::alloc_mutex->unlock();
 #endif
-
+			
+			if (!is_fundamental_type)
 			{
 				Write w;
 				w._ref(old_alloc);
@@ -215,7 +219,8 @@ class PoolVector {
 		}
 
 		//must be disposed!
-
+		
+		if (!is_fundamental_type)
 		{
 			int cur_elements = alloc->size / sizeof(T);
 
@@ -473,20 +478,20 @@ public:
 	~PoolVector() { _unreference(); }
 };
 
-template <class T>
-int PoolVector<T>::size() const {
+template <class T, bool is_fundamental_type>
+int PoolVector<T, is_fundamental_type>::size() const {
 
 	return alloc ? alloc->size / sizeof(T) : 0;
 }
 
-template <class T>
-T PoolVector<T>::get(int p_index) const {
+template <class T, bool is_fundamental_type>
+T PoolVector<T, is_fundamental_type>::get(int p_index) const {
 
 	return operator[](p_index);
 }
 
-template <class T>
-void PoolVector<T>::set(int p_index, const T &p_val) {
+template <class T, bool is_fundamental_type>
+void PoolVector<T, is_fundamental_type>::set(int p_index, const T &p_val) {
 
 	ERR_FAIL_INDEX(p_index, size());
 
@@ -494,15 +499,15 @@ void PoolVector<T>::set(int p_index, const T &p_val) {
 	w[p_index] = p_val;
 }
 
-template <class T>
-void PoolVector<T>::push_back(const T &p_val) {
+template <class T, bool is_fundamental_type>
+void PoolVector<T, is_fundamental_type>::push_back(const T &p_val) {
 
 	resize(size() + 1);
 	set(size() - 1, p_val);
 }
 
-template <class T>
-const T PoolVector<T>::operator[](int p_index) const {
+template <class T, bool is_fundamental_type>
+const T PoolVector<T, is_fundamental_type>::operator[](int p_index) const {
 
 	CRASH_BAD_INDEX(p_index, size());
 
@@ -510,8 +515,8 @@ const T PoolVector<T>::operator[](int p_index) const {
 	return r[p_index];
 }
 
-template <class T>
-Error PoolVector<T>::resize(int p_size) {
+template <class T, bool is_fundamental_type>
+Error PoolVector<T, is_fundamental_type>::resize(int p_size) {
 
 	ERR_FAIL_COND_V(p_size < 0, ERR_INVALID_PARAMETER);
 
@@ -586,15 +591,19 @@ Error PoolVector<T>::resize(int p_size) {
 
 		alloc->size = new_size;
 
-		Write w = write();
-
-		for (int i = cur_elements; i < p_size; i++) {
-
-			memnew_placement(&w[i], T);
+		if (!is_fundamental_type)
+		{
+			Write w = write();
+	
+			for (int i = cur_elements; i < p_size; i++) {
+	
+				memnew_placement(&w[i], T);
+			}
 		}
 
 	} else {
-
+		
+		if (!is_fundamental_type)
 		{
 			Write w = write();
 			for (int i = p_size; i < cur_elements; i++) {
@@ -630,8 +639,8 @@ Error PoolVector<T>::resize(int p_size) {
 	return OK;
 }
 
-template <class T>
-void PoolVector<T>::invert() {
+template <class T, bool is_fundamental_type>
+void PoolVector<T, is_fundamental_type>::invert() {
 	T temp;
 	Write w = write();
 	int s = size();
